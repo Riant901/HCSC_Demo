@@ -1,5 +1,6 @@
 pipeline 
   {
+
     environment 
        {
           registry = 'ansiblepocacr.azurecr.io/ansible_poc'
@@ -42,7 +43,7 @@ pipeline
                              }
                     }
              }
-         stage('Deploy Application to AKS') 
+         stage('Deploy Application to AKS for demo') 
 	    {
 		agent any    
 	      steps
