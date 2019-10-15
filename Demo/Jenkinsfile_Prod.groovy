@@ -8,7 +8,7 @@ node ('master') {
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
         cd $ws/stage
         echo "Download the artifacts for Deployment"
-        wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_release/"
+        #wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_release/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="prod"
