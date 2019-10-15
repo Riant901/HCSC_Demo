@@ -74,5 +74,8 @@ node ('master') {
                 mimeType:'text/html'
             )*/
         }
+    stage('Update the Release Dashboard') {
+      xlrCreateRelease releaseTitle: 'Release', serverCredentials: 'Admin', startRelease: true, template: 'Samples & Tutorials/ReleaseDashboard'
+}
 
 }
