@@ -76,7 +76,7 @@ node ('master') {
     stage('CONFIRM BUILD') {
         echo "CR created for PROD Deployment"
         timeout(30) {
-            input message: "Approve/Reject. Click proceed to initiate the QA Deployment?"
+            input message: "Approve/Reject. Click proceed to initiate the PROD Deployment?"
         }
     }
     stage('Trigger Prod Deployment') { 
