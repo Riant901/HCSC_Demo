@@ -24,7 +24,7 @@ node ('master') {
         rm -rf hcsc_output
         mkdir hcsc_output
         cd hcsc_output
-        cp -rf $ws/target/*.war .
+        cp -rf $ws/target/InformationCentre.war .
         cp -rf $ws/Configs/*.config .
         cd $ws
         zip -r hcsc_output.zip hcsc_output
