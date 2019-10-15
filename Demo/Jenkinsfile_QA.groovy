@@ -1,27 +1,21 @@
 node ('master') {
-    stage('CONFIRM BUILD') {
-        echo "You have selected QA Deployment"
-        timeout(30) {
-            input message: "You have selected the QA Deployment. Click proceed to initiate the QA Deployment?"
-        }
-    }
     stage('git Checkout') {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'd4c11305-d565-4fcd-b368-9c3afaa418ca', url: 'https://github.com/Riant901/HCSC_Demo.git']]]
     }
     stage('QA Deployment') {
         sh '''
-        pwd
-        ws="/var/lib/jenkins/workspace/Demo/Deployment"
-        cd $ws/qa_stage
+       pwd
+        ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
+        cd $ws/stage
         echo "Download the artifacts for Deployment"
         wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_qa/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="qa"
-        unzip output.zip
+        unzip hcsc_output.zip
         echo "Application Instance Stopped"
-        cp -rf $ws/qa_stage/output/*.war $ws/qa/webapps/
-        cp -rf $ws/qa_stage/output/$phase.config $ws/qa/configs/
+        cp -rf $ws/stage/hcsc_output/*.war $ws/stage/qa/webapps/
+        cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/qa/configs/
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''
@@ -48,7 +42,7 @@ node ('master') {
     stage('Promote Artifacts for UAT Deployment') {
        sh '''
        echo "Promoting the Artifacts to UAT started"
-            curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_qa/output.zip?to=/hcsc_uat/output.zip"
+            curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_qa/hcsc_output.zip?to=/hcsc_uat/hcsc_output.zip"
        echo "Promoting the Artifcats to UAT Completed"
             '''
         }
@@ -71,8 +65,14 @@ node ('master') {
                 mimeType:'text/html'
             )*/
         }
+stage('CONFIRM BUILD') {
+        echo "You have selected UAT Deployment"
+        timeout(30) {
+            input message: "You have selected the UAT Deployment. Click proceed to initiate the QA Deployment?"
+        }
+    }
     stage('Trigger UAT Deployment') { 
-        build job: 'UAT_Deploy', wait : false
+        build job: 'HCSC_UAT_Deploy', wait : false
     }
 
 }

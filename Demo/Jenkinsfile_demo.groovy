@@ -10,6 +10,13 @@ node ('master') {
         mvn clean install
         '''
     }
+    stage('Sonar Analysis') {
+        sh '''
+        echo "Sonar Analysis Started"
+        sleep 20s
+        echo "Sonar Analysis Completed" 
+        '''
+    }
     stage('Build-Package and Upload') {
         sh '''
         pwd
@@ -30,7 +37,6 @@ node ('master') {
         sh '''
         pwd
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
-        mkdir -p /var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment/stage/dev
         cd $ws/stage
         echo "Download the artifacts for Deployment"
         wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_dev/"
@@ -39,8 +45,8 @@ node ('master') {
         phase="dev"
         unzip hcsc_output.zip
         echo "Application Instance Stopped"
-        cp -rf $ws/stage/hcsc_output/*.war $ws/dev/webapps/
-        cp -rf $ws/stage/hcsc_output/$phase.config $ws/dev/configs/
+        cp -rf $ws/stage/hcsc_output/*.war $ws/stage/dev/webapps/
+        cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/dev/configs/
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''
@@ -48,8 +54,9 @@ node ('master') {
     stage('Liquibase DB Deployment') {
         sh '''
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy"
+        mkdir /var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/liquibase
         cd $ws/liquibase
-        ./liquibase  --driver=org.postgresql.Driver --classpath=postgresql-42.2.8.jar --url="jdbc:postgresql://localhost:5432/capDB" --changeLogFile=db.changelog-1.0.xml --username=shivam --password=devops@123 generateChangeLog
+        ./liquibase  --driver=org.postgresql.Driver --classpath=postgresql-42.2.8.jar --url="jdbc:postgresql://3.130.190.138:5432/mydb" --changeLogFile=db.changelog.xml --username=shivam --password=devops@123 update
         '''
     }
     stage('Application URL Check') {
@@ -92,8 +99,14 @@ node ('master') {
                 mimeType:'text/html'
             )*/
         }
+    stage('CONFIRM BUILD') {
+        echo "You have selected QA Deployment"
+        timeout(30) {
+            input message: "You have selected the QA Deployment. Click proceed to initiate the QA Deployment?"
+        }
+    }
     stage('Trigger QA Deployment') { 
-        build job: 'QA_Deploy', wait : false
+        build job: 'HCSC_QA_Deploy', wait : false
     }
 
 }

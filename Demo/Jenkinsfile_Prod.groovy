@@ -1,27 +1,21 @@
 node ('master') {
-    stage('CONFIRM BUILD') {
-        echo "You have selected QA Deployment"
-        timeout(30) {
-            input message: "You have selected the PROD Deployment. Click proceed to initiate the QA Deployment?"
-        }
-    }
     stage('git Checkout') {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'd4c11305-d565-4fcd-b368-9c3afaa418ca', url: 'https://github.com/Riant901/HCSC_Demo.git']]]
     }
-    stage('UAT Deployment') {
+    stage('PROD Deployment') {
         sh '''
         pwd
-        ws="/var/lib/jenkins/workspace/Demo/Deployment"
-        cd $ws/Prod_stage
+        ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
+        cd $ws/stage
         echo "Download the artifacts for Deployment"
         wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_release/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
-        phase="Prod"
-        unzip output.zip
+        phase="prod"
+        unzip hcsc_output.zip
         echo "Application Instance Stopped"
-        cp -rf $ws/Prod_stage/output/*.war $ws/PROD/webapps/
-        cp -rf $ws/Prod_stage/output/$phase.config $ws/PROD/configs/
+        cp -rf $ws/stage/hcsc_output/*.war $ws/stage/prod/webapps/
+        cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/prod/configs/
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''

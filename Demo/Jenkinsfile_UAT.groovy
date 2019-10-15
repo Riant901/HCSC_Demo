@@ -1,27 +1,21 @@
 node ('master') {
-    stage('CONFIRM BUILD') {
-        echo "You have selected QA Deployment"
-        timeout(30) {
-            input message: "You have selected the UAT Deployment. Click proceed to initiate the QA Deployment?"
-        }
-    }
     stage('git Checkout') {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'd4c11305-d565-4fcd-b368-9c3afaa418ca', url: 'https://github.com/Riant901/HCSC_Demo.git']]]
     }
     stage('UAT Deployment') {
         sh '''
-        pwd
-        ws="/var/lib/jenkins/workspace/Demo/Deployment"
-        cd $ws/uat_stage
+       pwd
+        ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
+        cd $ws/stage
         echo "Download the artifacts for Deployment"
-        wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_uat/"
+        wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_qa/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="uat"
-        unzip output.zip
+        unzip hcsc_output.zip
         echo "Application Instance Stopped"
-        cp -rf $ws/uat_stage/output/*.war $ws/UAT/webapps/
-        cp -rf $ws/uat_stage/output/$phase.config $ws/UAT/configs/
+        cp -rf $ws/stage/hcsc_output/*.war $ws/stage/UAT/webapps/
+        cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/UAT/configs/
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''
@@ -48,7 +42,7 @@ node ('master') {
     stage('Promote Artifacts for Release Deployment') {
        sh '''
        echo "Promoting the Artifacts to Release started"
-            curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_uat/output.zip?to=/hcsc_release/output.zip"
+            curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_uat/hcsc_output.zip?to=/hcsc_release/hcsc_output.zip"
        echo "Promoting the Artifcats to Release Completed"
             '''
         }
@@ -80,5 +74,16 @@ node ('master') {
                 mimeType:'text/html'
             )*/
         }
+    stage('CONFIRM BUILD') {
+        echo "CR created for PROD Deployment"
+        timeout(30) {
+            input message: "Approve/Reject. Click proceed to initiate the QA Deployment?"
+        }
+    }
+    stage('Trigger Prod Deployment') { 
+        build job: 'HCSC_Prod_Deploy', wait : false
+    }
+
+}
 
 }
