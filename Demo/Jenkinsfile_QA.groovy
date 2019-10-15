@@ -68,7 +68,7 @@ node ('master') {
 stage('CONFIRM BUILD') {
         echo "You have selected UAT Deployment"
         timeout(30) {
-            input message: "You have selected the UAT Deployment. Click proceed to initiate the QA Deployment?"
+            input message: "You have selected the UAT Deployment. Click proceed to initiate the UAT Deployment?"
         }
     }
     stage('Trigger UAT Deployment') { 
