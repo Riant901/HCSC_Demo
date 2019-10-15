@@ -10,6 +10,7 @@ node ('master') {
         mvn clean install
         '''
     }
+    
     stage('Sonar Analysis') {
         sh '''
         echo "Sonar Analysis Started"
