@@ -54,7 +54,6 @@ node ('master') {
     stage('Liquibase DB Deployment') {
         sh '''
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy"
-        mkdir /var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/liquibase
         cd $ws/liquibase
         ./liquibase  --driver=org.postgresql.Driver --classpath=postgresql-42.2.8.jar --url="jdbc:postgresql://3.130.190.138:5432/mydb" --changeLogFile=db.changelog.xml --username=shivam --password=devops@123 update
         '''
