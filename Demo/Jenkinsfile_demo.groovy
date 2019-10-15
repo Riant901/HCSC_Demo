@@ -22,6 +22,7 @@ node ('master') {
         sh '''
         pwd
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy"
+        cd $ws
         mkdir hcsc_output
         cd hcsc_output
         cp -rf $ws/target/InformationCentre.war .
