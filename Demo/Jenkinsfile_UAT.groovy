@@ -7,11 +7,13 @@ node ('master') {
        pwd
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
         cd $ws/stage
+        sleep 30s
         echo "Download the artifacts for Deployment"
         #wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_qa/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="uat"
+        sleep 15s
         #unzip hcsc_output.zip
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/UAT/webapps/
@@ -41,6 +43,7 @@ node ('master') {
     }
     stage('Promote Artifacts for Release Deployment') {
        sh '''
+       sleep 10s
        echo "Promoting the Artifacts to Release started"
             curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_uat/hcsc_output.zip?to=/hcsc_release/hcsc_output.zip"
        echo "Promoting the Artifcats to Release Completed"

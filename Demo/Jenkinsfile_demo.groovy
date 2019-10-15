@@ -47,15 +47,19 @@ node ('master') {
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/dev/webapps/
         cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/dev/configs/
+        sleep 20s
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''
     }
     stage('Liquibase DB Deployment') {
         sh '''
+        echo "DB Update Started"
+        sleep 15s
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy"
         cd $ws/liquibase
         ./liquibase  --driver=org.postgresql.Driver --classpath=postgresql-42.2.8.jar --url="jdbc:postgresql://3.130.190.138:5432/mydb" --changeLogFile=db.changelog.xml --username=shivam --password=devops@123 update
+        echo "DB Updated Completed"
         '''
     }
     stage('Application URL Check') {

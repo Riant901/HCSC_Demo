@@ -6,12 +6,14 @@ node ('master') {
         sh '''
         pwd
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
+        sleep 20s
         cd $ws/stage
         echo "Download the artifacts for Deployment"
         #wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_release/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="prod"
+        sleep 15s
         #unzip hcsc_output.zip
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/prod/webapps/
