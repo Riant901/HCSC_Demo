@@ -47,7 +47,6 @@ node ('master') {
             '''
         }
     stage('Create Change in ServiceNow') {
-       def response = serviceNow_createChange serviceNowConfiguration: [instance: 'dev74004', producerId: 'ddb36c9c-c428-40b7-9840-0e32870593e1'],credentialsId: 'admin',shortDescription:'Deploy to Test',type:'Standard',category:'Other',impact:'3- Low',risk:'Moderate',priority:'4 - Low',ci:'AS400'
         sh '''
         curl "https://dev74004.service-now.com/api/sn_chg_rest/v1/change/normal?no_such_field=something&description=HCSC&short_description=PROD_Deployment" \
         --request POST \
