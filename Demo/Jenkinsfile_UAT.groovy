@@ -12,7 +12,7 @@ node ('master') {
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="uat"
-        unzip hcsc_output.zip
+        #unzip hcsc_output.zip
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/UAT/webapps/
         cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/UAT/configs/
