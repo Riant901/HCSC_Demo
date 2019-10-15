@@ -1,0 +1,27 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: informationcenter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: infocenter
+    spec:
+      containers:
+      - name: infocenter-container
+        image: ansiblepocacr.azurecr.io/ansible_poc:{{Build.BuildID}}
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: informationcenter
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: infocenter

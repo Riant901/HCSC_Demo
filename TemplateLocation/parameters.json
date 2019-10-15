@@ -1,0 +1,12 @@
+ { 
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#", 
+    "contentVersion": "1.0.0.0", 
+    "parameters": { 
+      "adminUsername": { 
+        "value": "azureuser" 
+      }, 
+      "sshKeyData": { 
+        "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCxszM6QTisGhTlRHrslDmcI2/b5VEo8VSqYOGJ2+fJOxM+ImxPx1FXAgp7jbeDNXxPXhOtNbbXeFUaIHZfvlOPiovYlqAT9ArMW71/8OXWyvVyZfrPkvRPtwffYeE9zge2CTmirgzUs8v2iKumaiQH0Rk8m2HQcTvybv3jsst5ATxJ5fTXayJdKHybIoWxjVyxtRaadKZLp/be9Pod0EHu05jBRr1e9T1U8eQOt7N9ewtCpt8CqSpeM8git0Rlpgiobik5PM/43uwJDHV/I2T+FhX5lq2JKFXfu5pUUnr0m1EELyZm3HJM4dcz4q9sKiQcKJB2LvWsCfe3E7MV+YP engdop@Ansible-POC"
+      } 
+    } 
+  } 

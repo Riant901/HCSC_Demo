@@ -1,0 +1,530 @@
+ansible
+
+
+https://github.com/resmiantonyk/AnsiblePOC.git
+
+
+https://github.com/hariom12/Ansible_Usecase
+
+52.172.131.212 
+username- lin
+pass- devopps@12345
+
+104.211.211.76
+username POC1
+password devopps@12345
+
+
+https://medium.com/@somakdas/setting-up-and-executing-basic-ansible-playbook-643ac983680
+
+To create a new ansible project:
+
+Installing ansible in the host machine
+======================================
+$ sudo apt-get install software-properties-common
+$ sudo apt-add-repository ppa:ansible/ansible
+$ sudo apt-get update
+$ sudo apt-get install ansible
+
+Installing ansible in RHEL machine
+==================================
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+sudo rpm -i epel-release-latest-7.noarch.rpm 
+sudo yum update 
+sudo yum install ansible 
+sudo yum install python-pip 
+yum install python-wheel s  
+ansible localhost -m ping 
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+ 
+ 
+Configuring azure with ansible
+==============================
+az ad sp create-for-rbac --name ServicePrincipalName 
+<this to make new service principle which helps in founding tenant app id subscription and password>
+In the machine where ansible is configured
+mkdir ~/.azure
+vi ~/.azure/credentials 
+subscription_id=<your-subscription_id>
+client_id=<security-principal-appid>
+secret=<security-principal-password>
+tenant=<security-principal-tenant> 
+
+
+
+Installing powershell in Linux
+==============================
+# Register the Microsoft RedHat repository
+curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
+
+# Install PowerShell
+sudo yum install -y powershell
+
+# Start PowerShell
+pwsh
+
+
+Installing powershell in Ubuntu
+================================
+sudo apt-get install libunwind8 libicu55 -y
+wget https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-alpha.9/powershell_6.0.0-alpha.9-1ubuntu1.16.04.1_amd64.deb 
+sudo dpkg -i powershell_6.0.0-alpha.9-1ubuntu1.16.04.1_amd64.deb 
+ 
+
+
+
+create a vm using ARM template via powershell
+=============================================
+New-AzureRmResourceGroupDeployment -ResourceGroupName vmgrp -TemplateParameterFile DeployParameters.json -TemplateFile AzureDeploy.json
+
+
+ARM template:https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.parameters.json 
+
+create a vm using ARM template via azure cli
+============================================
+az group deployment create \
+  --name VMCreation \
+  --resource-group AnsibleRgp \
+  --template-file AzureDeploy.json \
+  --parameters DeployParameters.json
+  
+  
+az group deployment validate \ --resource-group vmgrp \ --template-file AzureDeploy.json \ --parameters @DeployParameters.json 
+
+  
+To create ansible folder structure
+==================================
+mkdir -p new_project
+cd new_project
+# inventory and master playbook
+touch production staging site.yml 
+touch hosts
+# folders
+mkdir -p group_vars host_vars library filter_plugins
+
+mkdir -p roles/common/{tasks,handlers,templates,files,vars,defaults,meta}
+touch roles/common/{tasks,handlers,templates,files,vars,defaults,meta}/main.yml
+
+For configuring ansible with azure
+==================================
+https://docs.ansible.com/ansible/2.5/scenario_guides/guide_azure.html
+
+
+Create azure credentials
+========================
+mkdir ~/.azure
+vi ~/.azure/credentials
+
+
+
+Ansible module for VM creation using ARM template 
+==============================================
+---
+ - name: Deploy a Vm using ARM template
+   shell: "
+          az group deployment create
+    --name Deploy_VM_SSH
+    --resource-group {{Resource_group}}
+    --template-file {{path_to_ARM_template}}
+    --parameters {{path_to_parameter_template}}"
+   register: deploy_return
+
+ - name: Variable assignment
+   set_fact: ipAddress="{{deploy_return.stdout | from_json}}"
+
+
+ - name: Debug the public ip
+   debug: msg="{{ipAddress.properties.outputs.ipaddress.value}}"
+
+ - name: add host to the host file
+   add_host:
+     name: "{{ipAddress.properties.outputs.ipaddress.value}}"
+     group: new_machine
+
+
+
+
+To add hostname dynamically
+===========================
+http://docs.catalystcloud.io/tutorials/ansible-create-x-servers-using-in-memory-inventory.html
+
+
+To install jenkins from Docker
+==============================
+http://www.scmgalaxy.com/tutorials/install-jenkins-using-docker/
+
+
+Install Jenkins using ansible
+=============================
+https://awsbloglink.wordpress.com/2017/11/02/how-to-install-jenkins-using-ansible/
+
+
+Install jenkins and docker
+==========================
+https://medium.com/@oleggorj/deploy-jenkins-with-docker-and-ansible-c76ee7854440
+
+
+configuring jenkins with sonar
+==============================
+https://ifritltd.com/2017/07/06/dockerize-jenkins-2-setup-with-sonarqube-declarative-build-pipeline/
+
+
+jenkins slave configuration
+===========================
+https://github.com/vfarcic/jenkins-docker-ansible/blob/master/ansible/roles/jenkins/files/config.xml
+
+Pip Installation in ubuntu
+===========================
+
+
+tasks/main.yml
+**************
+
+
+---
+- name: Get installed pip version
+  command: pip --version
+  register: pip_version_output
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download get-pip.py
+  get_url: url=https://bootstrap.pypa.io/get-pip.py
+           dest=/tmp/get-pip.py
+  when: pip_version_output | failed or not pip_version_output.stdout | search(pip_version)
+
+# Install pip if it's not already installed, or if
+# the desired versions of pip aren't installed
+# The regular expression extracts '9.0' out of '9.0.*'
+- name: Install pip
+  command: "python get-pip.py pip=={{ pip_version }}"
+  when:  pip_version_output | failed or not pip_version_output.stdout | search(pip_version)
+  args:
+    chdir: /tmp
+
+
+defaults/main.yml
+*****************
+
+---
+pip_version: "9.0.*"
+
+
+
+
+Docker installation in Ubuntu
+==============================
+- name: Add Docker Group
+  become: yes
+  become_method: su
+  become_user: nobody
+  group: name=docker state=present
+
+- name: Add Docker Signing Key
+  become: yes
+  become_method: su
+  become_user: nobody
+  apt_key:
+    keyserver: 'hkp://p80.pool.sks-keyservers.net:80'
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+    state: present
+
+- name: Add Docker Repo
+  become: yes
+  become_method: su
+  become_user: nobody
+  apt_repository:
+    repo: 'deb https://apt.dockerproject.org/repo debian-jessie main'
+    filename: 'docker.list'
+
+- name: Install Docker
+  become: yes
+  become_method: su
+  become_user: nobody
+  apt: name=docker-engine state=present
+
+- name: Install docker-py
+  become: yes
+  become_method: su
+  become_user: nobody
+  pip: name=docker-py version=1.9.0
+  
+  
+  
+DockerInstallation In ubuntu(2)
+===============================
+- hosts: all
+  become: true
+
+  tasks:
+    - name: ensure repository key is installed
+      apt_key:
+        id: "58118E89F3A912897C070ADBF76221572C52609D"
+        keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+        state: present
+
+    - name: ensure docker registry is available
+      # For Ubuntu 14.04 LTS, use this repository:
+      #apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main' state=present
+      # For Ubuntu 16.04 LTS, use this repo instead:
+       apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-xenial main' state=present
+
+    - name: ensure docker and dependencies are installed
+      apt: name=docker-engine update_cache=yes
+
+    # Uncomment the following to enable insecure registries with Docker
+    #- name: ensure docker can use insecure registries in 10.11.0.0/16
+    #  lineinfile: "dest=/etc/default/docker regexp=^DOCKER_OPTS line=DOCKER_OPTS='--insecure-registry 10.11.0.0/16'"
+
+    - service: name=docker state=restarted
+
+  
+  
+
+main file to call roles
+=======================
+
+---
+- name: VM Provisioning
+  hosts: localhost
+  connection: local
+  tasks:
+      - include_role:
+           name: provision_VM_using_ARM_template
+- name: Pip Installation
+  hosts: new_machine
+  remote_user: azureuser
+  tasks:
+      - include_role:
+           name: pip_installation
+- name: Docker Installation
+  hosts: new_machine
+  remote_user: azureuser
+  tasks:
+      - include_role:
+           name: docker_installation_ubuntu
+		   
+		 
+****************************************************************		 
+Jenkins Installation
+====================
+
+
+- name: Ensure jenkins directory on docker host
+  file:
+    state: directory
+    owner: 1000
+    group: 1000
+    path: /share/jenkins
+
+- name: Pull the latest official jenkins docker image
+  docker_image:
+    name: "jenkins:latest"
+
+- name: Create a container from the jenkins docker image
+  docker_container:
+    name: "jenkins-server"
+    image: "jenkins"
+    ports:
+        - "8080:8080"
+        - "50000:50000"
+    volumes:
+        - "/share/jenkins:/var/jenkins_home"
+    state: present
+    recreate: no
+	
+	
+	
+Service script
+==============
+
+[Unit]
+Description=Jenkins in a Docker container
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a jenkins-server
+ExecStop=/usr/bin/docker stop -t 2 jenkins-server
+
+[Install]
+WantedBy=default.target
+
+
+
+
+Service SCript enable and disable
+=================================
+
+
+- name: Copy systemd service script to start and stop the jenkins container
+  copy: src=files/jenkins.service dest=/etc/systemd/system
+
+- name: Reload systemctl
+  shell: systemctl reload-or-restart docker-jenkins
+
+- name: Enable the docker-jenkins service
+  shell: systemctl enable docker-jenkins
+
+ *********************************************************************************
+ 
+ Download Jenkins Installation Job  
+ =================================
+( Navigate to the roles folder)
+ ansible-galaxy install --roles-path . emmetog.jenkins
+ 
+ Add jenkins role in main file
+ =============================
+ - name: Jenkins Installation
+  hosts: new_machine
+  vars:
+    
+    jenkins_url: http://127.0.0.1
+    jenkins_port: 8080
+    jenkins_install_via: "docker"
+    jenkins_jobs: [
+        "my-first-job",
+      ]
+  remote_user: azureuser
+  tasks:
+      - include_role:
+           name: emmetog.jenkins
+
+
+(with varibles)
+ 
+ 
+ 
+*Change the jenkins_config_owner in defaults to an existing user 
+
+
+Sonarqube integration with jenkinsand maven
+===========================================
+
+https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Maven
+
+
+docker-custom-build-environment
+
+
+Installing docker inside jenins and containerising
+==================================================
+
+dockerfile
+=========
+
+from jenkinsci/jenkins:lts
+ 
+USER root
+RUN apt-get update -qq \
+    && apt-get install -qqy apt-transport-https ca-certificates curl gnupg2 software-properties-common 
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+RUN add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+RUN apt-get update  -qq \
+    && apt-get install docker-ce=17.12.1~ce-0~debian -y
+RUN usermod -aG docker jenkins
+
+cmds to run 
+===========
+docker image build -t jenkins-docker .
+
+docker container run -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock jenkins-docker
+
+docker login
+
+docker tag maven pooja1989/maven_sonar
+
+docker push -t jenkins_docker
+
+
+
+To connect to acontainer
+=======================
+
+docker container exec -it <container_name> bash
+
+
+
+Sonar Scanner config.xml to be polaced in jenkinshome
+=====================================================
+
+hudson.plugins.sonar.SonarRunnerInstallation.xml
+
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.sonar.SonarRunnerInstallation_-DescriptorImpl plugin="sonar@2.6.1">
+  <installations>
+    <hudson.plugins.sonar.SonarRunnerInstallation>
+      <name>sonar1</name>
+      <properties>
+        <hudson.tools.InstallSourceProperty>
+          <installers>
+            <hudson.plugins.sonar.SonarRunnerInstaller>
+              <id>3.2.0.1227</id>
+            </hudson.plugins.sonar.SonarRunnerInstaller>
+          </installers>
+        </hudson.tools.InstallSourceProperty>
+      </properties>
+    </hudson.plugins.sonar.SonarRunnerInstallation>
+  </installations>
+</hudson.plugins.sonar.SonarRunnerInstallation_-DescriptorImpl>
+
+
+Maven config.xml for maven instalation in jenkins
+=================================================
+
+hudson.tasks.Maven.xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.tasks.Maven_-DescriptorImpl>
+  <installations>
+    <hudson.tasks.Maven_-MavenInstallation>
+      <name>maven1</name>
+      <properties>
+        <hudson.tools.InstallSourceProperty>
+          <installers>
+            <hudson.tasks.Maven_-MavenInstaller>
+              <id>3.5.4</id>
+            </hudson.tasks.Maven_-MavenInstaller>
+          </installers>
+        </hudson.tools.InstallSourceProperty>
+      </properties>
+    </hudson.tasks.Maven_-MavenInstallation>
+  </installations>
+</hudson.tasks.Maven_-DescriptorImpl>
+
+
+
+Maven settings.xml to integrate sonar server configs
+====================================================
+
+settings.xml to include 
+
+<settings>
+    <pluginGroups>
+        <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+    </pluginGroups>
+    <profiles>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- Optional URL to server. Default value is http://localhost:9000 -->
+                <sonar.host.url>
+                  http://104.215.191.157:9000
+                </sonar.host.url>
+            </properties>
+        </profile>
+     </profiles>
+</settings>
+
+By using this settings.xml, can directly call sonar:sonar in maven goals
+
+
+ 

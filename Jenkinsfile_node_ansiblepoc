@@ -1,0 +1,9 @@
+node('docker') {
+    stage "Checkout"
+    git 'https://github.com/Tonyamoljose/InformationCentre.git'
+   
+    docker.image('pooja1989/maven:v1.1').inside {
+        stage "Maven Build"
+        sh 'mvn clean install'
+		}
+	}
