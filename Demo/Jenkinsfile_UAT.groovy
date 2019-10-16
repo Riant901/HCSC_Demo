@@ -51,7 +51,7 @@ node ('master') {
         }
     stage('Create Change in ServiceNow') {
         sh '''
-        curl "https://dev74004.service-now.com/api/sn_chg_rest/v1/change/normal?no_such_field=something&description=HCSC&short_description=PROD_Deployment" \
+        curl "https://dev74004.service-now.com/api/sn_chg_rest/v1/change/normal?no_such_field=something&description=HCSC&short_description=Sample" \
         --request POST \
         --header "Accept:application/json" \
         --user 'admin':'8HncCfWhGd4Y'
