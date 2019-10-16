@@ -7,7 +7,7 @@ node ('master') {
        pwd
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
         cd $ws/stage
-        sleep 30s
+        sleep 10s
         echo "Download the artifacts for Deployment"
         #wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_qa/"
         echo "Download Completed"
@@ -43,7 +43,7 @@ node ('master') {
     }
     stage('Promote Artifacts for Release Deployment') {
        sh '''
-       sleep 10s
+       sleep 5s
        echo "Promoting the Artifacts to Release started"
             curl -X POST -u admin:Db7Xu8Sd7Bd6Gr "https://jfroguser.jfrog.io/jfroguser/api/copy/hcsc_uat/hcsc_output.zip?to=/hcsc_release/hcsc_output.zip"
        echo "Promoting the Artifcats to Release Completed"
@@ -58,6 +58,7 @@ node ('master') {
             ''' 
         }
     stage('Email Notification') {
+        println "Email Notification Send"
             /*string var="<hr> <head><style>table {border-collapse: collapse;width: 100%; font-family: Calibri (Body)," +
             " Helvetica, sans-serif;}th, td {text-align: left; padding: 8px;font-size: 11px;} tr:nth-child(even)" +
             "{background-color: #f2f2f2} th { background-color: #4CAF50;color: white;}th, td { border: 1px solid #ddd;}h3," +

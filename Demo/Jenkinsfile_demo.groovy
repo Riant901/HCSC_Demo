@@ -14,7 +14,7 @@ node ('master') {
     stage('Sonar Analysis') {
         sh '''
         echo "Sonar Analysis Started"
-        sleep 20s
+        sleep 10s
         echo "Sonar Analysis Completed" 
         '''
     }
@@ -48,7 +48,7 @@ node ('master') {
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/dev/webapps/
         cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/dev/configs/
-        sleep 20s
+        sleep 15s
         echo "Application Instance Started" 
         echo "Deployment Completed"
         '''
@@ -85,6 +85,7 @@ node ('master') {
             '''
         }
     stage('Email Notification') {
+        println "Email Notification Send"
             /*string var="<hr> <head><style>table {border-collapse: collapse;width: 100%; font-family: Calibri (Body)," +
             " Helvetica, sans-serif;}th, td {text-align: left; padding: 8px;font-size: 11px;} tr:nth-child(even)" +
             "{background-color: #f2f2f2} th { background-color: #4CAF50;color: white;}th, td { border: 1px solid #ddd;}h3," +

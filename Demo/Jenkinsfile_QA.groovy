@@ -8,13 +8,13 @@ node ('master') {
         ws="/var/lib/jenkins/workspace/HCSC_Dev_Build_Deploy/Deployment"
         cd $ws/stage
         echo "Download the artifacts for Deployment"
-        sleep 15s
+        sleep 10s
         #wget --user=admin --password=Db7Xu8Sd7Bd6Gr -r --no-parent -nH --cut-dirs=2 "https://jfroguser.jfrog.io/jfroguser/hcsc_qa/"
         echo "Download Completed"
         echo "Connect to Deployment Servers"
         phase="qa"
         #unzip hcsc_output.zip
-        sleep 25s
+        sleep 15s
         echo "Application Instance Stopped"
         cp -rf $ws/stage/hcsc_output/*.war $ws/stage/qa/webapps/
         cp -rf $ws/stage/hcsc_output/$phase.config $ws/stage/qa/configs/
@@ -49,6 +49,7 @@ node ('master') {
             '''
         }
     stage('Email Notification') {
+        println "Email Notification Send"
             /*string var="<hr> <head><style>table {border-collapse: collapse;width: 100%; font-family: Calibri (Body)," +
             " Helvetica, sans-serif;}th, td {text-align: left; padding: 8px;font-size: 11px;} tr:nth-child(even)" +
             "{background-color: #f2f2f2} th { background-color: #4CAF50;color: white;}th, td { border: 1px solid #ddd;}h3," +
